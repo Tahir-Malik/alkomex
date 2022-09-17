@@ -1,0 +1,35 @@
+{
+  "name": "alchomex",
+  "version": "1.0.0",
+  "description": "Pharma inventary",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "nodemon --exec 'mocha -R min'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/ravi09basil/alchomex-backend.git"
+  },
+  "author": "Ravi Basil",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/ravi09basil/alchomex-backend#readme",
+  "dependencies": {
+    "async": "^3.0.1",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "mongoose": "^5.4.5",
+    "multer": "^1.4.1",
+    "nodemailer": "^6.2.1",
+    "phantom-html-to-pdf": "^0.5.6",
+    "ramda": "^0.26.1",
+    "request": "^2.88.0",
+    "xlsx": "^0.14.1"
+  }
+}

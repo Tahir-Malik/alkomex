@@ -1,0 +1,152 @@
+<html><head>
+    <title>Credit note</title>
+</head>
+​
+<body>
+    <style>
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            padding: 0;
+            margin: 0;
+        }
+​
+        table {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+​
+        td {
+            white-space: pre-line;
+            padding: 6px 12px;
+            font-size: 8px;
+        }
+​
+        table tr th {
+            font-size: 14px;
+            padding: 6px 12px;
+            font-weight: normal;
+        }
+​
+        p {
+            margin-bottom: -1em;
+            margin-top: 0em;
+        }
+    </style>
+    <!--credit note structure start here -->
+    <table border="1" cellspacing="0" cellpadding="0" style=" width: 100%;padding: 0;border-collapse: collapse; font-family: -webkit-pictograph;">
+      <tbody>
+        <tr>
+                <td colspan="6" style="text-align: center;">
+                    <h3>Alkomex Pharma Private Limited</h3>
+                    <p>A-18, SECTOR-23, NOIDA - 201301, U.P. (INDIA)</p>
+                    <p>Ph: +91 - 120 4316092, Mobile: +91-9811271853</p>
+                    <p>Email:Piyush@herbovedaindia.com, Website: www.herbovedaindia.com</p>
+                </td>
+            </tr><tr>
+            <td colspan="8" style="text-align: center;font-size: 14px;font-family: -webkit-pictograph;font-weight: 600;vertical-align: middle;line-height: 4px;padding-bottom: 10px;">CREDIT NOTE</td>
+        </tr>
+        <tr>
+            <td colspan="8" style="text-align: center;font-size: 14px;font-family: -webkit-pictograph;font-weight: 300;vertical-align: middle;line-height: 4px;padding-bottom: 10px;">SUPPLY MEANT FOR EXPORT UNDER BOND OR LETTER UNDERTAKING WITHOUT PAYMENT OF IGST</td>
+        </tr>
+            <tr>
+                <td colspan="3" style="width: 250px;vertical-align: top;line-height: 6px;">
+                    <table style="width: 100%; max-width: 100%;">
+                        <tbody><tr>
+                            <td style="vertical-align:top; width:60px; white-space: nowrap;">Buyer ADDRESS</td>
+                            <td style="vertical-align: top;line-height: 8px;">
+                                <h3 style="margin-top:0px; white-space: nowrap;"><b>&lt;%=customerdata.basic_details.registered_name %&gt;</b></h3>
+                                <p>&lt;%=customerdata.basic_details.address %&gt;</p><br>
+                                <p>&lt;%=customerdata.basic_details.country %&gt;</p><br>
+                                <p>VAT no.: &lt;%=customerdata.basic_details.vat_number %&gt;</p><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; width:60px; white-space: nowrap;">
+                                Shipping Address
+                            </td>
+                            <td style="vertical-align: top;line-height: 8px;">
+                                <h3 style="margin-top:0px; white-space: nowrap;"><b>&lt;%=customerdata.basic_details.registered_name %&gt;</b></h3>
+                                <p>&lt;%=customerdata.basic_details.address %&gt;</p><br>
+                                <p>&lt;%=customerdata.basic_details.country %&gt;</p><br>
+                                <p>VAT no.: &lt;%=customerdata.basic_details.vat_number %&gt;</p><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Kind Auth</td>
+                            <td>Gabriela Prosser</td>
+                        </tr>
+                    </tbody></table>
+                </td>
+                <td colspan="3" style="width:auto;vertical-align: top;line-height: 17px;">
+              <p><b>INVOICE NO.:&nbsp;</b>CNOP/19-20019 </p>
+    <p><b>DATED:&nbsp;</b>16.02.19 </p>      
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="padding: 0;border-collapse: collapse;"><table cellspacing="0" cellpadding="0" style="width:100%;margin-top: 0px;margin-bottom: -9px;">
+                        <thead style="background-color: #ddd;padding: 6px 0;">
+                            <tr>
+                                <th style="text-align: left;font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">S.No.</th>
+                                <th style="text-align: left;width: 70%;font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Description of Goods</th>
+                                
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Quantity(Units)</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Unit
+                                    Price (USD)</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;">Total(USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody style="min-height: 400px;"><tr>
+                                <td style="border-right: 1px SOLID #010101;white-space:nowrap;">&lt;%=(i+1) %&gt;</td>
+                                <td style="border-right: 1px SOLID #202020;">&lt;%= pi.products[i].customerCodeNumber %&gt; (&lt;%=pi.products[i].client_product_code %&gt;)</td>
+                                
+                                <td style="border-right: 1px SOLID #494747;text-align: center;">
+                                    &lt;%= pi.products[i].quantity %&gt;
+                                </td>
+                                <td style="border-right: 1px SOLID #363636;text-align: center;">
+                                    &lt;%= pi.products[i].price - pi.products[i].flatDiscount %&gt;
+                                </td>
+                                <td style="text-align: right;">
+                                    &lt;%= pi.products[i].amount %&gt;
+                                </td>
+                            </tr></tbody>
+                        <tfoot>
+                            <tr>
+                                <td style="/* border-bottom: 1px solid #000; *//* border-top: 1px solid #000; */border-right: 1px solid #000;height: 200px;"></td>
+                                <td style="/* border-bottom: 1px solid #000; *//* border-top: 1px solid #000; */border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; *//* border-top: 1px solid #000; */border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; *//* border-top: 1px solid #000; */border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; *//* border-top: 1px solid #000; *//* border-right: 1px solid #000; */"></td>
+                                
+                            </tr>
+     <tr>
+                                <td style="/* border-bottom: 1px solid #000; */border-top: 1px solid #000;border-right: 1px solid #000;/* height: 200px; */"></td>
+                                <td style="/* border-bottom: 1px solid #000; */border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; */border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; */border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="/* border-bottom: 1px solid #000; */border-top: 1px solid #000;/* border-right: 1px solid #000; */"></td>
+                                
+                            </tr>
+                        </tfoot>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <p>
+                        </p><h5> Please remit the funds to the below:
+                            BANK OF NEW YORK, NO-1, WALL STREET, NEW YORK, N.Y. 10015
+                            Nostro Account Number 890 0517 794 CHIPS UID 402260 FEDWIRE Routing No. - 021000018 SWIFT CODE IRVT US 3NXXX
+                            For further credit to account # 3411132810 of HERBOVEDA INDIA, with Kotak Mahindra Bank, Sector-18, Noida 210301
+                            SWIFT CODE: KKBKINBBCPC
+                            IEC Code: 0504071629</h5>
+                    <p></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- Credit Node structure Ends here -->
+</body></html>

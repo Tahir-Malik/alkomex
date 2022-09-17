@@ -1,0 +1,318 @@
+const generateuid = require('../services/generateuid')
+const packinglistModel = require('../models/packinglist');
+const portofloadingModel = require('../models/portofloading');
+const placeofreceiptModel = require('../models/placeofreceipt');
+const piModel = require('../models/pi');
+const PDFConverter = require("phantom-html-to-pdf")({});
+const customerModel = require('../models/customer')
+const Mailer = require('../services/mailer')
+const fs = require('fs')
+const path = require('path');
+const async = require("async");
+var mongoose = require('mongoose')
+const ObjectId = mongoose.Types.ObjectId;
+
+
+exports.create_packinglist = ({ res, body }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let packing_list_data = await packinglistModel.find().sort('-packing_list_number').limit(1).exec();
+            let { packing_list_uid, packing_list_number } = await generateuid.generateuidtypes({ uiddata: packing_list_data, uidtype: 'packinglist' })
+            let productlist = [];
+            if (body.products.length > 0) {
+                async.each(body.products, function (product, callback) {
+                    let price = parseFloat(product.price);
+                    if (product.flatDiscount) {
+                        price = price - parseFloat(product.flatDiscount)
+                    }
+                    let amount = price * parseFloat(product.quantity);
+                    let manufacturing_date = new Date(product.manufacturing_date);
+                    let shelf_life = parseFloat(product.shelf_life.split(' ')[0])
+                    manufacturing_date.setMonth(manufacturing_date.getMonth() + shelf_life)
+                    manufacturing_date = manufacturing_date.toString('dd-MM-yyyy');
+                    let productobj = {
+                        product_id: product.product_id, client_product_code: product.client_product_code, customerCodeNumber: product.customerCodeNumber, hsn_code: product.hsn_code, shipper_size_inner_dimension: product.shipper_size_inner_dimension, batch_number: product.batch_number, number_of_packages: product.number_of_packages, total_packing_carton: product.total_packing_carton, unit_of_billing: product.unit_of_billing, complete_packaging_profile: product.complete_packaging_profile, minimum_batch_size: product.minimum_batch_size,
+                        maximum_batch_size: product.maximum_batch_size, registration_no: product.registration_no, registration_date: product.registration_date, shelf_life: product.shelf_life, expiry_date: manufacturing_date, frieght: product.frieght, insurance: product.insurance, quantity: product.quantity, net_weight: product.net_weight, gross_weight: product.gross_weight, pi_uid: product.pi_uid, client_po_number: product.client_po_number, manufacturing_date: product.manufacturing_date, price: price, amount: amount
+                    };
+                    productlist.push(productobj);
+                    callback(null);
+                },
+                    async function (err) {
+                        if (!err) {
+                            const packinglistObj = new packinglistModel({
+                                packing_list_uid: packing_list_uid,
+                                packing_list_number: packing_list_number,
+                                client: body.client,
+                                mode_of_shipping: body.mode_of_shipping,
+                                place_of_receipt: body.place_of_receipt,
+                                port_of_loading: body.port_of_loading,
+                                port_of_discharge: body.port_of_discharge,
+                                products: productlist,
+                                shipping: body.shipping,
+                                special_comments: body.special_comments
+                            });
+                            let packingList = await packinglistObj.save();
+                            await generateandsentpackinglistdoc(res, packingList.packing_list_uid);
+                            resolve(packingList)
+                        } else {
+                            throw new Error(err);
+                        }
+                    }
+                );
+            } else {
+                const packinglistObj = new packinglistModel({
+                    packing_list_uid: packing_list_uid,
+                    packing_list_number: packing_list_number,
+                    client: body.client,
+                    mode_of_shipping: body.mode_of_shipping,
+                    place_of_receipt: body.place_of_receipt,
+                    port_of_loading: body.port_of_loading,
+                    port_of_discharge: body.port_of_discharge,
+                    products: productlist,
+                    shipping: body.shipping,
+                    special_comments: body.special_comments
+                });
+                let packingList = await packinglistObj.save();
+                await generateandsentpackinglistdoc(res, packingList.packing_list_uid);
+                resolve(packingList)
+            }
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.get_packinglist = ({ }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let packinglist = await packinglistModel.find();
+            resolve(packinglist)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.getportofloadings = ({ }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let portofloadingList = await portofloadingModel.find({}, { _id: 0, port_code: 1, port_name: 1, country_name: 1 })
+            resolve(portofloadingList)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.getplaceofreceipts = ({ }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let placeofreceiptList = await placeofreceiptModel.find({}, { _id: 0, place_name: 1, country_name: 1 })
+            resolve(placeofreceiptList)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.getproductlists = ({ client_uid }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let productlists = [];
+            let pis = await piModel.aggregate([{ $match: { $and: [{ 'client.client_uid': client_uid }, { status: 'OpenOrder' }] } }, { $project: { pi_uid: 1, client_po_number: 1, 'client.client_uid': 1, products: { $filter: { input: '$products', as: 'products', cond: { $eq: ['$$products.testing.status', true] } } } } }])
+            if (pis.length > 0) {
+                async.each(pis, function (pi, cb1) {
+                    let piobj = { pi_uid: pi.pi_uid, client_po_number: pi.client_po_number }
+                    if (pi.products.length > 0) {
+                        let products = [];
+                        async.each(pi.products, async function (product, cb2) {
+                            let packinglist = await packinglistModel.aggregate([{ $match: { $and: [{ 'client.client_uid': pis[0].client.client_uid }] } }, { $project: { products: { $filter: { input: '$products', as: 'products', cond: { $and: [{ $eq: ['$$products.pi_uid', piobj.pi_uid] }, { $eq: ['$$products.product_id', product.product_uid] }] } } } } }])
+                            let quantity = product.quantity;
+                            if (packinglist.length > 0 && packinglist[0].products.length > 0) {
+                                async.each(packinglist[0].products, function (item, cb3) {
+                                    if (item.quantity != product.quantity) {
+                                        quantity = quantity - item.quantity;
+                                        cb3(null)
+                                    } else {
+                                        cb3({ err: 'Equal quantity' })
+                                    }
+                                }, function (err) {
+                                    if (!err) {
+                                        let productobj = {
+                                            _id: product._id, product_uid: product.product_uid, client_product_code: product.client_product_code,
+                                            price: product.price, flatDiscount: product.flatDiscount, amount: product.amount, quantity: quantity, customerCodeNumber: product.customerCodeNumber,
+                                            complete_packaging_profile: product.complete_packaging_profile, unit_of_billing: product.unit_of_billing, registration_no: product.registration_no,
+                                            registration_date: product.registration_date, shelf_life: product.shelf_life, frieght: product.frieght, insurance: product.insurance, hsn_code: product.hsn_code,
+                                            minimum_batch_size: product.minimum_batch_size, maximum_batch_size: product.maximum_batch_size, shipper_size_inner_dimension: product.shipper_size_inner_dimension
+                                        }
+                                        products.push(productobj)
+                                    }
+                                })
+                            } else {
+                                let productobj = {
+                                    _id: product._id, product_uid: product.product_uid, client_product_code: product.client_product_code,
+                                    price: product.price, flatDiscount: product.flatDiscount, amount: product.amount, quantity: quantity, customerCodeNumber: product.customerCodeNumber,
+                                    complete_packaging_profile: product.complete_packaging_profile, unit_of_billing: product.unit_of_billing, registration_no: product.registration_no,
+                                    registration_date: product.registration_date, shelf_life: product.shelf_life, frieght: product.frieght, insurance: product.insurance, hsn_code: product.hsn_code,
+                                    minimum_batch_size: product.minimum_batch_size, maximum_batch_size: product.maximum_batch_size, shipper_size_inner_dimension: product.shipper_size_inner_dimension
+                                }
+                                products.push(productobj)
+                            }
+                        }, function (err) {
+                            if (!err) {
+                                if (products.length > 0) {
+                                    piobj = Object.assign({ products: products }, piobj);
+                                    productlists.push(piobj);
+                                }
+                            }
+                            cb1(null);
+                        })
+                    } else {
+                        cb1(null);
+                    }
+                }, function (err) {
+                    resolve(productlists)
+                })
+            } else {
+                resolve(productlists)
+            }
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.getOne_packinglist = ({ packingid }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let packingList = await packinglistModel.findById(packingid);
+<<<<<<< HEAD
+            if(packingList && packingList.invoice_uid){
+
+            }
+=======
+>>>>>>> e292b5eaf4d53c37ba3196f2f5c00ad3145148ea
+            resolve(packingList)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.getallpri_post_order = ({ }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let pri_orders = await piModel.aggregate([{ $match: { $or: [{ status: 'OpenOrder' }, { status: 'ShippedOrder' }] } }, { "$group": { "_id": 0, "openorder_count": { "$sum": { "$cond": [{ "$eq": ["$status", "OpenOrder"] }, 1, 0] } }, "shippedorder_count": { "$sum": { "$cond": [{ "$eq": ["$status", "ShippedOrder"] }, 1, 0] } } } }, { "$project": { "_id": 0, "total_priorder": { "$add": ["$openorder_count", "$shippedorder_count"] } } }]);
+           let total_orders = { pri_order: pri_orders[0].total_priorder, post_order: 0 };
+            if (!pri_orders || pri_orders == null) {
+                throw new Error('Order does not exists.');
+            }
+            resolve(total_orders)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+exports.delete = (req, res) => {
+    packinglistModel.findByIdAndRemove(req.params.id)
+        .then(packingList => {
+            if (!packingList || packingList == null) {
+                return res.status(200).send({
+                    response: 'Packing list not found.',
+                });
+            }
+            res.status(200).send({ message: "Packing list deleted successfully" });
+        })
+        .catch(err => {
+            res.status(500).send({ message: "Internal Server Error" })
+        })
+}
+
+function generateandsentpackinglistdoc(res, packing_uid) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let packinglistdata = await packinglistModel.findOne({ packing_list_uid: packing_uid })
+            if (!packinglistdata || packinglistdata == null) {
+                throw new Error('Packinglist does not exists.');
+            }
+            let customerdata = await customerModel.findOne({ customer_uid: packinglistdata.client.client_uid })
+            if (!customerdata || customerdata == null) {
+                throw new Error('customer does not exists.');
+            }
+            let dir = `${path.dirname(process.mainModule.filename)}/upload/packinglist`
+            let packinglist_document = `packinglist_${packinglistdata.packing_list_uid}_${new Date().getTime()}.pdf`
+            let invoice = `${dir}/${packinglist_document}`;
+            let total_val = await generatepackinglistproducts(packinglistdata);
+            await packinglistModel.findOneAndUpdate({ packing_list_uid: packing_uid }, { $set: { 'admin_document.packinglist_doc': packinglist_document } }, { new: true })
+            res.render('packinglist', { packinglist: packinglistdata, customerdata: customerdata, total_val: total_val }, async (err, html) => {
+                if (err) {
+                    throw new Error('html is not generated.');
+                } else {
+                    PDFConverter({ html: html, printDelay: 0, fitToPage: false, allowLocalFilesAccess: true }, async (err, pdf) => {
+                        if (err) {
+                            throw new Error('pdf is not generated.');
+                        } else {
+                            if (!fs.existsSync(dir)) {
+                                fs.mkdirSync(dir);
+                            }
+                            let stream = fs.createWriteStream(invoice);
+                            pdf.stream.pipe(stream);
+                            attachments = [{
+                                filename: packinglist_document,
+                                contentType: 'application/pdf',
+                                path: `${path.dirname(process.mainModule.filename)}/upload/packinglist/${packinglist_document}`
+                            }]
+                            await Mailer.send(process.env.ADMINEMAIL, 'Packing list', `Please find the below attachment for ${packinglistdata.packing_list_uid}`, attachments);
+                            resolve(packinglistdata)
+                        }
+                    })
+                }
+            })
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+
+async function generatepackinglistproducts(packinglist) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let supplierorderno = []; let buyerorderno = []; let hsncodes = []; let total_quantity = 0; let total_net_weight = 0; let total_gross_weight = 0; let units = []; let products = []; let cartonsNo = 1; let total_carton = 0;
+            async.each(packinglist.products, function (product, callback) {
+                if (supplierorderno.indexOf(product.pi_uid) < 0) {
+                    supplierorderno.push(product.pi_uid);
+                }
+                if (buyerorderno.indexOf(product.client_po_number) < 0) {
+                    buyerorderno.push(product.client_po_number)
+                }
+                if (units.indexOf(product.unit_of_billing) < 0) {
+                    units.push(product.unit_of_billing);
+                }
+                if (hsncodes.indexOf(product.hsn_code) < 0) {
+                    hsncodes.push(product.hsn_code);
+                }
+                total_quantity += product.quantity;
+                total_net_weight += product.net_weight;
+                total_gross_weight += product.gross_weight;
+                let no_of_pkgs = '';
+                total_carton += product.total_packing_carton;
+                no_of_pkgs = no_of_pkgs.concat(cartonsNo).concat(' To ').concat(total_carton);
+                cartonsNo += product.total_packing_carton;
+                products.push({ total_packing_carton: product.total_packing_carton, no_of_pkgs: no_of_pkgs, complete_packaging_profile: product.complete_packaging_profile, client_product_code: product.client_product_code, batch_number: product.batch_number, shipper_size_inner_dimension: product.shipper_size_inner_dimension, expiry_date: product.expiry_date, hsn_code: product.hsn_code, quantity: product.quantity, unit_of_billing: product.unit_of_billing, price: product.price, amount: product.amount })
+                callback(null)
+            }, async function (err) {
+                if (!err) {
+                    resolve({ products: products, total_carton: total_carton, supplierorderno: supplierorderno.join(), units: units.join('/'), buyerorderno: buyerorderno.join(), hsncodes: hsncodes.join(), total_quantity: total_quantity, total_net_weight: total_net_weight, total_gross_weight: total_gross_weight })
+                } else {
+                    throw new Error(err);
+                }
+            }
+            );
+            resolve(invoice)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}

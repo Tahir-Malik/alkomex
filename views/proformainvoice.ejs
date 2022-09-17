@@ -1,0 +1,219 @@
+<html>
+
+<head>
+    <title>Proforma Invoice</title>
+</head>
+
+<body>
+    <style>
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        td {
+            white-space: pre-line;
+            padding: 6px 12px;
+            font-size: 8px;
+        }
+
+        table tr th {
+            font-size: 14px;
+            padding: 6px 12px;
+            font-weight: normal;
+        }
+
+        p {
+            margin-bottom: -1em;
+            margin-top: 0em;
+        }
+    </style>
+    <!--proforma invoice structure start here -->
+    <table border="1" cellspacing="0" cellpadding="0" style=" width: 100%;padding: 0;border-collapse: collapse; font-family: -webkit-pictograph;">
+        <tbody>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <h3>Alkomex Pharma Private Limited</h3>
+                    <p>A-18, SECTOR-23, NOIDA - 201301, U.P. (INDIA)</p>
+                    <p>Ph: +91 - 120 4316092, Mobile: +91-9811271853</p>
+                    <p>Email:Piyush@herbovedaindia.com, Website: www.herbovedaindia.com</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="background-color: #ddd;text-align: center;font-size: 12px;"><b>PROFORMA INVOICE</b></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="width: 250px;vertical-align: top;line-height: 6px;">
+                    <table style="width: 100%; max-width: 100%;">
+                        <tr>
+                            <td style="vertical-align:top; width:60px; white-space: nowrap;">Buyer ADDRESS</td>
+                            <td style="vertical-align: top;line-height: 8px;">
+                                <h3 style="margin-top:0px; white-space: nowrap;"><b><%=customerdata.basic_details.registered_name %></b></h3>
+                                <p><%=customerdata.basic_details.address %></p><br>
+                                <p><%=customerdata.basic_details.country %></p><br>
+                                <p>VAT no.: <%=customerdata.basic_details.vat_number %></p><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; width:60px; white-space: nowrap;">
+                                Shipping Address
+                            </td>
+                            <td style="vertical-align: top;line-height: 8px;">
+                                <h3 style="margin-top:0px; white-space: nowrap;"><b><%=customerdata.basic_details.registered_name %></b></h3>
+                                <p><%=customerdata.basic_details.address %></p><br>
+                                <p><%=customerdata.basic_details.country %></p><br>
+                                <p>VAT no.: <%=customerdata.basic_details.vat_number %></p><br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Kind Auth</td>
+                            <td><%=customerdata.client_poc[0].name %></td>
+                        </tr>
+                    </table>
+                </td>
+                <td colspan="3" style="width:auto;vertical-align: top;line-height: 6px;">
+                    <table style="width: 100%; max-width: 100%;">
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Proforma Invoice</td>
+                            <td style="padding:2px 12px;"><%=pi.pi_uid %></td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Pl Date</li>
+                            <td style="padding:2px 12px;"><%=new Date(pi.createdAt).toDateString("yyyy-MM-dd") %></td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Buyer Order No.</td>
+                            <td style="padding:2px 12px;"><%=pi.client_po_number %></td>  
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap; height: 50px;">Buyer Order Dt.</td>
+                            <td style="padding:2px 12px;"><%=new Date(pi.date_of_issue_of_po).toDateString("yyyy-MM-dd") %></td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Terms of Payment</td>
+                            <td style="padding:2px 12px;">120 days from the date of B/L</td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Terms of Delivery</td>
+                            <td style="padding:2px 12px;">CIF (<%=pi.mode_of_shipping %>)</td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Dispatch By</td>
+                            <td style="padding:2px 12px;"><%=pi.mode_of_shipping %></td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Port of Loading</td>
+                            <td style="padding:2px 12px;">INDIA</td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Port of Discharge</td>
+                            <td style="padding:2px 12px;"><%=customerdata.basic_details.ports_of_discharge[0] %></td>
+                        </tr>
+                        <tr style="vertical-align: top;line-height: 6px;">
+                            <td style="padding:2px 12px; width:60px; white-space: nowrap;">Dispatch Date</td>
+                            <td style="padding:2px 12px;"><%=new Date(pi.estimated_dispatch_date).toDateString("yyyy-MM-dd") %></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="padding: 0;border-collapse: collapse;">
+                    <table cellspacing="0" cellpadding="0" style="width:100%;margin-top: -9px;margin-bottom: -9px;">
+                        <thead style="background-color: #ddd;padding: 6px 0;">
+                            <tr>
+                                <th style="text-align: left;font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">S.No.</th>
+                                <th style="text-align: left;width: 200px;font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Description of Goods</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">No.
+                                    of Batch X Batch Size</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Quantity(Units)</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;border-right: 1px solid #000;">Unit
+                                    Price (USD)</th>
+                                <th style="font-weight: bold;font-size: 8px;background-color: #fff;border-bottom: 1px solid #000;">Total(USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody style="min-height: 400px;">
+                            <% for(var i=0; i<pi.products.length; i++) {%>
+                            <tr>
+                                <td style="border-right: 1px SOLID #010101;white-space:nowrap;"><%=(i+1) %></td>
+                                <td style="border-right: 1px SOLID #202020;"><%= pi.products[i].customerCodeNumber %> (<%=pi.products[i].client_product_code %>)</td>
+                                <td style="border-right: 1px SOLID #171717;text-align: center;">
+                                    <%=pi.products[i].minimum_batch_size%> x <%= pi.products[i].quantity/pi.products[i].minimum_batch_size %>
+                                </td>
+                                <td style="border-right: 1px SOLID #494747;text-align: center;">
+                                    <%= pi.products[i].quantity %>
+                                </td>
+                                <td style="border-right: 1px SOLID #363636;text-align: center;">
+                                    <%= pi.products[i].price - pi.products[i].flatDiscount %>
+                                </td>
+                                <td style="text-align: right;">
+                                    <%= pi.products[i].amount %>
+                                </td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;">Total CIF Sea <%=customerdata.basic_details.ports_of_discharge[0] %> (USD)<br>
+                                    <%=pi.discount_type %> Discount 
+                                    <br>Net PI Value
+                                </td>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;"></td>
+                                <td style="border-bottom: 1px solid #000;border-top: 1px solid #000;border-right: 1px solid #000;text-align: right;"><%=pi.gross_price %><br>
+                                    <%=pi.discount_on_gross_price %>
+                                    <br><%=pi.total_price %>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="vertical-align: top; padding: 0px">
+                    <u>Performa Invoice Value in Words</u>
+                    <br> US Dollar <%=total_price %> <br>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" style="vertical-align: top;border-right-color: white; padding: 0px">
+                    <h5>For Alkomex Pharma Pvt. Ltd. :</h5>
+                    <br>
+                    <br>
+                    <p>Piyush Mittal</p>
+                    <br>
+                </td>
+                <td style="text-align: center;vertical-align: top; border-left-color: white; padding: 0px;    border-left-color: #fff;">
+                    <h5>Acceped &amp; Agreed by:</h5>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <p>
+                        <h5> Please remit the funds to the below:
+                            BANK OF NEW YORK, NO-1, WALL STREET, NEW YORK, N.Y. 10015
+                            Nostro Account Number 890 0517 794 CHIPS UID 402260 FEDWIRE Routing No. - 021000018 SWIFT CODE IRVT US 3NXXX
+                            For further credit to account # 3411132810 of HERBOVEDA INDIA, with Kotak Mahindra Bank, Sector-18, Noida 210301
+                            SWIFT CODE: KKBKINBBCPC
+                            IEC Code: 0504071629</h5>
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- invoice structure Ends here -->
+</body>
+
+</html>
+

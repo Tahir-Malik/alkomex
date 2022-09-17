@@ -1,0 +1,210 @@
+<html><head>
+    <title>Proforma Invoice</title>
+</head>
+
+<body>
+    <style>
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        td {
+            white-space: pre-line;
+            padding: 6px 12px;
+            font-size: 8px;
+        }
+
+        table tr th {
+            font-size: 14px;
+            padding: 6px 12px;
+            font-weight: normal;
+        }
+
+        p {
+            margin-bottom: -1em;
+            margin-top: 0em;
+        }
+    </style>
+    <!-- Invoice structure start here -->
+    <table border="1" cellspacing="0" cellpadding="0" style=" width: 100%;padding: 0;border-collapse: collapse; font-family: -webkit-pictograph;">
+        <tbody>
+        <tr>
+            <td colspan="8" style="text-align: center;font-size: 14px;font-family: -webkit-pictograph;font-weight: 600;vertical-align: middle;line-height: 4px;padding-bottom: 10px;">
+                EXPORT INVOICE
+            </td>
+        </tr>
+        <tr>
+            <td colspan="8" style="text-align: center;font-size: 14px;font-family: -webkit-pictograph;font-weight: 300;vertical-align: middle;line-height: 4px;padding-bottom: 10px;">
+                    SUPPLY MEANT FOR EXPORT ON PAYMENT OF IGST
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="vertical-align: top;padding: 0px;">
+                <b>Exporter</b>
+                <h4><b>Alkomex Pharma Private Limited</b></h4>
+                <p>A-18, Sector - 23, Noida - 201 301</p>
+                <p>Uttar Pradesh, INDIA</p>
+                <p>Ph: +91 120 4316092</p>
+                <p>IEC No.0504071629</p>
+                <p>GSTN : 09AAJPM4220B1Z4</p>
+            </td>
+            <td colspan="5" style="padding: 0;">
+                <table border="1" cellspacing="0" cellpadding="0" style="width: 100%;padding: 0;border-collapse: inherit;font-family: -webkit-pictograph;margin-top: -9px;margin-bottom: -9px;border: 0;">
+                    <tbody><tr>
+                        <td style="padding: 0;height: 20px;line-height: 13px;border-top: 0;border-bottom: 1px solid #a09f9f;"><p style="padding: 3px 0 16px;">Invoice No. &amp; Date</p><h4><b><%=invoice.invoice_uid %>, <%=new Date(invoice.createdAt).toDateString("yyyy-MM-dd") %></b></h4></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0;border-bottom: 1px solid #a09f9f;"><p style="padding: 3px 0 16px;">Supplier's Order No.</p><h4><b><%=total_val.supplierorderno %></b></h4></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0;border-bottom: 1px solid #a09f9f;"><p style="padding: 3px 0 16px">Buyer's Order No.</p><h4><%=total_val.buyerorderno %></h4></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0;"><p style="padding: 3px 0 16px">LUT NO. :-</p><h4>08/LUT/R/-20/DIV-IV/CGST/NOIDA/2018-19 DT.02-06-2019</h4></td>
+                    </tr>
+                </tbody></table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="padding: 0;vertical-align: top;">
+                <b>Consignee's Name & Address :</b>
+                <h4><b><%=customerdata.basic_details.registered_name %></b></h4>
+                <p><%=customerdata.basic_details.address %></p>
+                <p><%=customerdata.basic_details.country %></p>
+                <b>VAT nº: <%=customerdata.basic_details.vat_number %></b>
+            </td>
+            <td colspan="5" style="padding: 0;vertical-align: top;">
+                <b>Notify Party (Buyer If other than Consignee) :</b>
+                <h4><b><%=customerdata.notify_party.registered_name %></b></h4>
+                <p><%=customerdata.notify_party.address %></p>
+                <p><%=customerdata.notify_party.country %></p>
+                <b style="padding-bottom: 5px;display: block;">VAT nº: <%=customerdata.notify_party.vat_number %></b>
+            </td>
+        </tr>
+        <tr>
+          <td colspan="8" style="padding: 0;background-color: #ddd;height: 20px;"></td>
+       </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 0;padding-bottom: 0;vertical-align: top;">
+                Pre-Carriage by
+            </td>
+            <td colspan="3" style="text-align: center;padding-top: 0;padding-bottom: 0;">Place of Receipt by Precarrier<br><b><%=invoice.place_of_receipt %></b></td>
+            <td colspan="2" style="text-align: center;padding-top: 0;padding-bottom: 0;">Country of Origin of Goods<br><b>INDIA</b></td>
+            <td colspan="1" style="text-align: center;padding-top: 0;padding-bottom: 0;">Country of Final Destination<br><b><%=customerdata.basic_details.country %></b></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 0;padding-bottom: 0;vertical-align: top;">Vessel/Flight No.<br><b><%=invoice.mode_of_shipping %></b></td>
+            <td colspan="3" style="text-align: center;padding-top: 0;padding-bottom: 0;">Port of Loading <br><b><%=invoice.port_of_loading %></b></td>
+            <td colspan="3" rowspan="2" style="text-align: center;padding-top: 0;padding-bottom: 0;">
+                Terms of Delivery &amp; Payment <br>
+                <b>Price USD CIF/Sea to <%=customerdata.basic_details.ports_of_discharge[0] %> <%=customerdata.basic_details.country %> to <%=customerdata.basic_details.ports_of_discharge[0] %> Warehouse <%=customerdata.basic_details.country %> 120 Days from Date of Airway Bill</b>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding-top: 0;padding-bottom: 0;">Port of Discharge<br><b><%=customerdata.basic_details.ports_of_discharge[0] %>,<%=customerdata.basic_details.country %></b></td>
+            <td colspan="3" style="text-align: center">Final Destination<br><b><%=customerdata.basic_details.ports_of_discharge[0] %>,<%=customerdata.basic_details.country %></b></td>
+        </tr>
+        <tr>
+            <td>Marks & Nos</td>
+            <td>No. & Kind of Pkgs</td>
+            <td>Description of Goods</td>
+            <td>HSN Code</td>
+            <td>Quantity</td>
+            <td>Unit</td>
+            <td>Rate</td>
+            <td>Amount</td>
+        </tr>
+        <% for(var i=0; i<total_val.products.length; i++) {%>
+        <!-- Repeater start -->
+        <tr>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top;padding-top: 26px;"> <%= total_val.products[i].total_packing_carton %></td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top;padding-top: 26px;padding-left: 2px;"> <%= total_val.products[i].no_of_pkgs %></td>
+            <td style="border-bottom-color: #fff;vertical-align: top;padding-top: 26px;"><h3><b> <%= total_val.products[i].client_product_code %></b></h3>
+                <p>(<%= total_val.products[i].complete_packaging_profile %>)</p>
+                <p>BATCH NO. <%= total_val.products[i].batch_number %></p>
+                <p>MFG : <%=new Date(total_val.products[i].manufacturing_date).toDateString("yyyy-MM-dd") %></p>
+                <p>EXP. DT.: <%=new Date(total_val.products[i].expiry_date).toDateString("yyyy-MM-dd") %></p>
+                <br>
+            </td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top;padding-top: 26px;"><%= total_val.products[i].hsn_code %></td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top; padding-top: 26px;"><%= total_val.products[i].quantity %></td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top; padding-top: 26px;"><%= total_val.products[i].unit_of_billing %></td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top;padding-top: 26px;"><%= total_val.products[i].price %></td>
+            <td style="text-align: center; border-bottom-color: #fff;vertical-align: top;padding-top: 26px;text-align:right;"><%= total_val.products[i].amount %></td>
+        </tr>
+        <% } %>
+        <!-- Repeater End -->
+        <tr>
+            <td colspan="2" rowspan="5">
+                <br>
+                <br>
+            </td>
+            <td colspan="2"><b>Total FOB Value (USD)</b></td>
+            <td><%=total_val.total_quantity %></td>
+            <td><%=total_val.units %></td>
+            <td></td>
+            <td style="text-align:right"><%=invoice.gross_price %></td>
+        </tr>
+        <tr>
+            <td colspan="4"><b>Insurance</b></td>
+            <td></td>
+            <td style="text-align:right"><%=invoice.insurance %></td>
+        </tr>
+        <tr>
+            <td colspan="4"><b>Freight</b></td>
+            <td></td>
+            <td style="text-align:right"><%=invoice.freight %></td>
+        </tr>
+        <tr>
+            <td colspan="4"><b>Add: IGST</b></td>
+            <td></td>
+            <td style="text-align:right">--</td>
+        </tr>
+        <tr>
+            <td colspan="4"><b>Total Value (CIF)</b></td>
+            <td></td>
+            <td style="text-align:right"><%=invoice.total_price %></td>
+        </tr>
+        <tr>
+            <td colspan="9" style="vertical-align: top; padding: 0px;">
+                <u style="color:blue;">Invoice Amount in Words</u><br>
+                <p>US Dollars <%=total_price %></p>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="9" style="padding: 0;background-color: #ddd;height: 20px;"></td>
+        </tr>
+        <tr>
+            <td colspan="5" style="vertical-align: top; padding: 0px;">
+                <p style="color:blue;">Terms &amp; Conditions</p>
+                <h3><b>Manufature Name & Address :-</b></h3>
+                <p><b>SAIN MEDICAMENTS PVT. LTD.</b></p>
+                <p>P-2/4,I.D.A.,UPPAL HYDERABAD-500039</p>
+                <p>GST NO : 36AACCS8292F1Z3</p>
+                <p><b>CIN : U2423OTG1983PTC004015</b></p>
+            </td>
+            <td colspan="4">
+                <br>
+                <h3>For Alkomex Pharma Pvt. Ltd.</h3>
+                <br>
+                <br>
+                <br>
+                Authorised Signatory
+            </td>
+        </tr>
+    </tbody></table>
+    <!-- invoice structure Ends here -->
+
+
+</body></html>
